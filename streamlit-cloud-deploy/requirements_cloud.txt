@@ -1,4 +1,6 @@
-streamlit>=1.28.0
-crewai>=0.177.0
-langchain-openai>=0.3.32
-python-dotenv>=1.1.1
+streamlit
+crewai
+langchain-openai
+python-dotenv
+requests
+
