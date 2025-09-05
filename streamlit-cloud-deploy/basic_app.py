@@ -18,22 +18,8 @@ st.markdown("OpenAI API를 사용하여 블로그 콘텐츠를 생성합니다."
 with st.sidebar:
     st.header("⚙️ 설정")
     
-    # OpenAI API 키 입력 (자동 저장)
-    default_key = os.getenv("OPENAI_API_KEY", "")
-    if "openai_api_key" not in st.session_state:
-        st.session_state.openai_api_key = default_key
-    
-    api_key = st.text_input(
-        "OpenAI API 키",
-        type="password",
-        value=st.session_state.openai_api_key,
-        help="OpenAI API 키를 입력하세요. 입력한 키는 자동으로 저장됩니다."
-    )
-    
-    # API 키 저장
-    if api_key and api_key != st.session_state.openai_api_key:
-        st.session_state.openai_api_key = api_key
-        st.success("✅ API 키가 저장되었습니다!")
+    # OpenAI API 키 자동 로드 (환경 변수에서)
+    api_key = os.getenv("OPENAI_API_KEY", "")
     
     # 모델 선택
     model = st.selectbox(
@@ -43,13 +29,12 @@ with st.sidebar:
     )
     
     # API 키 상태 표시
-    if st.session_state.openai_api_key:
-        st.success("🔑 API 키가 설정되었습니다!")
-        if st.button("🗑️ API 키 초기화", help="저장된 API 키를 삭제합니다."):
-            st.session_state.openai_api_key = ""
-            st.rerun()
+    if api_key:
+        st.success("🔑 API 키가 자동으로 설정되었습니다!")
+        st.info("💡 API 키는 환경 변수에서 자동으로 로드됩니다.")
     else:
-        st.warning("⚠️ API 키를 입력해주세요.")
+        st.error("❌ API 키가 설정되지 않았습니다!")
+        st.warning("⚠️ Streamlit Cloud Secrets에서 OPENAI_API_KEY를 설정해주세요.")
 
 # 메인 컨텐츠
 col1, col2 = st.columns([1, 1])
@@ -65,13 +50,13 @@ with col1:
     )
     
     # 생성 버튼
-    if st.button("🚀 콘텐츠 생성", type="primary", disabled=not topic or not st.session_state.openai_api_key):
-        if topic and st.session_state.openai_api_key:
+    if st.button("🚀 콘텐츠 생성", type="primary", disabled=not topic or not api_key):
+        if topic and api_key:
             with st.spinner("콘텐츠를 생성하고 있습니다..."):
                 try:
                     # OpenAI API 호출 (requests 사용)
                     headers = {
-                        "Authorization": f"Bearer {st.session_state.openai_api_key}",
+                        "Authorization": f"Bearer {api_key}",
                         "Content-Type": "application/json"
                     }
                     
